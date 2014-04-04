@@ -1,0 +1,74 @@
+ <% if @view_in_config && @erb_code %>
+  <%= render inline: ERB.new(@erb_code).result(binding) %>
+  
+  <% else %>
+<div class="pagination"><%= will_paginate models %></div>
+    <table class="table table-striped">
+		<tr>
+			<th>#</th>
+			<th><%= t('Project Name') %></th>
+			<th><%= t('Customer') %></th>
+			<th><%= t('Part Name') %></th>
+			<th><%= t('Part#') %></th>
+			<th><%= t('Spec') %></th>
+			<th><%= t('Qty/Unit') %></th>
+			<th><%= t('Order Date') %></th>
+			<th><%= t('Supplier') %></th>
+			<th><%= t('Manufacturer') %></th>
+			<th><%= t('Receiving Date') %></th>
+			<th><%= t('Received') %></th>
+			<th><%= t('Last Updated By') %></th>
+			<th></th>
+			<th></th>
+			
+		</tr>
+		<% models.each do |r| %>
+		  <tr>
+		  	<% unless has_action_right?('show', params[:controller], r) %>
+		  	  <td><%= prt(r, :id) %></td>
+		  	<% else %>
+		  	  <td><%= link_to r.id.to_s, SUBURI + "/authentify/view_handler?index=1&url=#{bom_path(r)}" %></td>
+		  	<% end %>
+		  	<% unless has_action_right?('show', BillOfMaterialx.project_class.to_s.underscore.pluralize) %>
+		  	  <td><%= prt(r, 'project.name') %></td>
+		  	<% else %>
+		  	  <td><%= link_to r.project.name, SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.show_project_path))}" %></td>
+		  	<% end %>
+		  	<% unless has_action_right?('show', BillOfMaterialx.customer_class.to_s.underscore.pluralize) %>
+		  	  <td><%= BillOfMaterialx.customer_class.find_by_id(BillOfMaterialx.project_class.find_by_id(r.project_id).customer_id).name %></td>
+		  	<% else %>
+		  	  <td><%= link_to r.customer.short_name, SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.show_customer_path))}" %></td>
+		  	<% end %>
+		  	<td><%= prt(r, :name) %></td>
+			<td><%= prt(r, :part_num) %></td>
+			<td><%= prt(r, :spec) %></td>
+			<td><%= prt(r, :qty) %>/<%= prt(r, :unit) %></td>
+			<td><%= r.order_date.strftime("%Y/%m/%d") if r.order_date.present? %></td>
+			<% unless has_action_right?('show', BillOfMaterialx.supplier_class.to_s.underscore.pluralize) %>
+		  	  <td><%= prt(r, 'supplier.short_name') if r.supplier_id.present? %></td>
+		  	<% else %>
+		  	  <td><%= link_to r.supplier.short_name, SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.show_supplier_path))}" if r.supplier_id.present? %></td>
+		  	<% end %>
+		    <td><%= prt(r, 'manufacturer.short_name') if r.manufacturer_id.present? %></td>
+		  	<td><%= r.receiving_date.strftime("%Y/%m/%d") if r.receiving_date.present? %></td>
+			<td><%= r.received ? t('Yes') : t('No') %></td>
+			<td><%= prt(r, 'last_updated_by.name') %></td> 
+			<td><%= link_to t('Quote Tasks'), SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.quote_task_index_path.to_s))}", :class => BUTTONS_CLS['action']   %></td>
+			<td><%= link_to t('Quotes'), SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.quote_index_path.to_s))}", :class => BUTTONS_CLS['action']   %> </td>
+			<td><%= link_to t('Edit'), SUBURI + "/authentify/view_handler?index=1&url=#{edit_bom_path(r, :parent_record_id => r.project_id, :parent_resource => BillOfMaterialx.project_class.to_s.underscore.pluralize)}", :class => BUTTONS_CLS['action']  if has_action_right?('update', params[:controller], r) %></td>
+		  </tr>
+		<% end %>
+	</table>
+	
+	<table class="table table-striped">
+	  <tr>
+	    <th>
+	    	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	    	<%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action']  %>
+	    	
+	    </th>
+	  </tr>
+	</table>
+	
+	<% end %>
+	

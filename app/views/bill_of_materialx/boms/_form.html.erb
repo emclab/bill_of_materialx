@@ -1,0 +1,33 @@
+<% if @view_in_config && @erb_code %>
+  <%= render inline: @erb_code %>
+  
+  <% else %>
+<%= simple_form_for @bom do |f| %> 
+
+  <%= f.input :customer_name, :label => t('Customer'), :readonly => true, :input_html => {:value => @customer.name} %>
+  <%= f.input :project_name, :label => t('Project Name'), :readonly => true, :input_html => {:value => @project.name} %>
+  <%= f.input :name, :label => t('Part Name'), :readonly => readonly?(@bom, 'name') %>  
+  <%= f.input :part_num, :label => t('Part#'), :readonly => readonly?(@bom, 'part_num') %>
+  <%= f.input :spec, :label => t('Spec'), :input_html => {:rows => 3}, :readonly => readonly?(@bom, 'spec') %>
+  <%= f.input :qty, :label => t('Qty'), :readonly => readonly?(@bom, 'qty') %>
+  <%= f.input :unit, :label => t('Qty Unit'), :collection => @qty_unit, :readonly => readonly?(@bom, 'unit') %>
+  <%= f.input :order_date, :label => t('Order Date'), :as => :string, :readonly => readonly?(@bom, 'order_date') %>
+  <%= f.input :received, :label => t("Received?"), :as => :boolean unless readonly?(@bom, 'received') %>
+  <%= f.input :received_noupdate, :label => t("Received?"), :readonly => true, :input_html => {:value => @bom.received ? t('Yes') : t('No') } if readonly?(@bom, 'received') %>
+  <%= f.input :status_id, :label => t('BOM Status'), :collection => Commonx::MiscDefinition.where(:for_which => 'bom_status') unless readonly?(@bom, 'status_id') %>
+  <%= f.input :status_id, :label => t('BOM Status'), :readonly => true, :input_html => {:value => @bom.status.name} if readonly?(@bom, 'status_id') %>
+  <%= f.input :supplier_id, :label => t('Supplier'), :collection => BillOfMaterialx.supplier_class.where(:active => true).order('id') unless readonly?(@bom, 'supplier_id') %>
+  <%= f.input :supplier_name, :label => t('Supplier'),  :readonly => true, :input_html => {:value => @bom.supplier.name} if @bom.supplier_id.present? && readonly?(@bom, 'supplier_id') %>
+  <%= f.input :manufacturer_id, :label => t('Manufacturer'), :collection => BillOfMaterialx.manufacturer_class.where(:active => true).order('id') unless readonly?(@bom, 'manufacturer_id') %>
+  <%= f.input :manufacturer_name, :label => t('Manufacturer'), :readonly => true, :input_html => {:value => @bom.manufacturer.name} if @bom.manufacturer_id.present? && readonly?(@bom, 'manufacturer_id') %>  
+  <%= f.input :receiving_date, :label => t('Receiving Date'), :as => :string %>
+  <%= f.input :actual_receiving_date, :label => t("Actual Receiving Date"), :as => :string %> 
+  <%= f.input :void_noupdate, :label => t('Void'), :readonly => true, :required => false, :input_html => {:value => @bom.void} if readonly?(@bom, 'void') %>
+  <%= f.input :void, :label => t('Void'), :input_html => {:value => @bom.void} unless readonly?(@bom, 'void') %>
+  <%= f.input :brief_note, :label => t('Brief Note'), :readonly => readonly?(@bom, 'brief_note'), :input_html => {:rows => 2} %>
+    
+  <%= link_to t('Back'), SUBURI + "/authentify/view_handler?index=0", :class => BUTTONS_CLS['action'] %>
+  <%= f.button :submit, t('Save'), :class => BUTTONS_CLS['action'] %>  
+<% end %>  
+
+<% end %>
