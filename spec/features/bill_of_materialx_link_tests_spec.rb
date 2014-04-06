@@ -47,12 +47,17 @@ describe "LinkTests" do
         :sql_code => "record.last_updated_by_id == session[:user_id]")
       user_access = FactoryGirl.create(:user_access, :action => 'create_bom', :resource => 'commonx_logs', :role_definition_id => @role.id, :rank => 1,
       :sql_code => "")
-      
+      ua1 = FactoryGirl.create(:user_access, :action => 'index', :resource => 'event_taskx_event_tasks', :role_definition_id => @role.id, :rank => 1,
+           :sql_code => "EventTaskx::EventTask.where(:cancelled => false).order('created_at DESC')")
+      user_access = FactoryGirl.create(:user_access, :action => 'index', :resource =>'in_quotex_quotes', :role_definition_id => @role.id, :rank => 1,
+        :sql_code => "InQuotex::Quote.where(:void => false).order('created_at DESC')")
         
       #@pur_sta = FactoryGirl.create(:commonx_misc_definition, 'for_which' => 'bom_status')
       @cust = FactoryGirl.create(:kustomerx_customer) 
       @proj = FactoryGirl.create(:ext_construction_projectx_project, :customer_id => @cust.id) 
       @mfg = FactoryGirl.create(:manufacturerx_manufacturer)
+      quote_task = FactoryGirl.create(:event_taskx_event_task, :task_category => 'quote_bom')
+      in_quote = FactoryGirl.create(:in_quotex_quote, :task_id => quote_task.id)
       
       visit '/'
       #save_and_open_page
@@ -74,6 +79,29 @@ describe "LinkTests" do
       save_and_open_page
       fill_in 'bom_name', :with => 'a test bom'
       click_button 'Save'
+      #with wrong data
+      visit boms_path
+      #save_and_open_page
+      page.should have_content('BOMs')
+      click_link 'Edit'
+      fill_in 'bom_name', :with => ''
+      click_button 'Save'
+      save_and_open_page
+      
+      #index page should see link for quote task and quotes
+      visit boms_path
+      #save_and_open_page
+      page.should have_content('BOMs')
+      save_and_open_page
+      click_link 'Quote Tasks'
+      save_and_open_page
+      #
+      visit boms_path
+      #save_and_open_page
+      page.should have_content('BOMs')
+      save_and_open_page
+      click_link 'Quotes'
+      save_and_open_page
       
       visit boms_path
       click_link task.id.to_s
@@ -91,6 +119,16 @@ describe "LinkTests" do
       fill_in 'bom_qty', :with => 100
       select('piece', :from => 'bom_unit')
       click_button 'Save'
+      #with wrong data
+      visit new_bom_path(:project_id => @proj.id)
+      page.should have_content('New BOM')
+      fill_in 'bom_name', :with => ''
+      fill_in 'bom_spec', :with => 'a test spec'
+      fill_in 'bom_qty', :with => 100
+      select('piece', :from => 'bom_unit')
+      click_button 'Save'
+      save_and_open_page
+      
       
     end
   end
