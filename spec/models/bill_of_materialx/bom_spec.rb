@@ -17,6 +17,11 @@ module BillOfMaterialx
       c.should_not be_valid
     end
     
+    it "should reject nil spec" do
+      c = FactoryGirl.build(:bill_of_materialx_bom, :spec => nil)
+      c.should_not be_valid
+    end
+    
     it "should reject dup name for same project and manufacturer" do
       c = FactoryGirl.create(:bill_of_materialx_bom, :name => "nil")
       c1 = FactoryGirl.build(:bill_of_materialx_bom, :name => "Nil", :project_id => c.project_id, :manufacturer_id => c.manufacturer_id)

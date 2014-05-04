@@ -3,8 +3,10 @@ class CreateExtConstructionProjectxProjects < ActiveRecord::Migration
   def change
     create_table :ext_construction_projectx_projects do |t|
       t.string :name
+      t.text :project_desp
       t.integer :customer_id
       t.integer :status_id
+      t.integer :category_id
       t.text :construction_address
       t.text :customer_contact
       t.text :construction_spec
