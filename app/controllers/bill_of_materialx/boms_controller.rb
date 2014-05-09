@@ -30,6 +30,7 @@ module BillOfMaterialx
         @project = BillOfMaterialx.project_class.find_by_id(params[:bom][:project_id]) if params[:bom].present? && params[:bom][:project_id].present?
         @customer = BillOfMaterialx.customer_class.find_by_id(@project.customer_id) if params[:bom].present? && params[:bom][:project_id].present?
         @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
+        @erb_code = find_config_const('bom_new_view', 'bill_of_materialx')
         flash[:notice] = t('Data Error. Not Saved!')
         render 'new'
       end
@@ -52,6 +53,7 @@ module BillOfMaterialx
         redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       else
         @qty_unit = find_config_const('piece_unit').split(',').map(&:strip)
+        @erb_code = find_config_const('bom_edit_view', 'bill_of_materialx')
         flash[:notice] = t('Data Error. Not Updated!')
         render 'edit'
       end
