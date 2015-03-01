@@ -2,6 +2,8 @@
   <%= render inline: @erb_code %>
   
   <% else %>
+  <h4><%=@title %></h4>
+
 <%= simple_form_for @bom do |f| %> 
 
   <%= f.input :customer_name, :label => t('Customer'), :readonly => true, :input_html => {:value => @customer.name} %>
