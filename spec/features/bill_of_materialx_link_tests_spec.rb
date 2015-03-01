@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe "LinkTests" do
+RSpec.describe "LinkTests", type: :request do
   describe "GET /bill_of_materialx_link_tests" do
     mini_btn = 'btn btn-mini '
     ActionView::CompiledTemplates::BUTTONS_CLS =
@@ -70,65 +70,78 @@ describe "LinkTests" do
       supplier = FactoryGirl.create(:supplierx_supplier)
       status = FactoryGirl.create(:commonx_misc_definition, :for_which => 'bom_status')
       task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id, :supplier_id => supplier.id, :status_id => status.id, 
-                                  :manufacturer_id => @mfg.id, :last_updated_by_id => @u.id)
-      visit boms_path
-      #save_and_open_page
-      page.should have_content('BOMs')
-      click_link 'Edit'
-      page.should have_content('Edit BOM')
+                                  :manufacturer_id => @mfg.id, :last_updated_by_id => @u.id, unit: 'set')
+      visit bill_of_materialx.boms_path
       save_and_open_page
+      expect(page).to have_content('BOMs')
+      click_link 'Edit'
+      expect(page).to have_content('Update BOM')
       fill_in 'bom_name', :with => 'a test bom'
       click_button 'Save'
+      #
+      visit bill_of_materialx.boms_path
+      save_and_open_page
+      expect(page).to have_content('a test bom')
       #with wrong data
-      visit boms_path
+      visit bill_of_materialx.boms_path
       #save_and_open_page
-      page.should have_content('BOMs')
+      expect(page).to have_content('BOMs')
       click_link 'Edit'
       fill_in 'bom_name', :with => ''
+      fill_in 'bom_spec', :with => 'a test spec-bad-edit'
+      
       click_button 'Save'
       save_and_open_page
+      #
+      visit bill_of_materialx.boms_path
+      expect(page).not_to have_content('a test spec-bad-edit')
       
       #index page should see link for quote task and quotes
-      visit boms_path
+      visit bill_of_materialx.boms_path
       #save_and_open_page
-      page.should have_content('BOMs')
+      expect(page).to have_content('BOMs')
       save_and_open_page
       click_link 'Quote Tasks'
       save_and_open_page
       #
-      visit boms_path
+      visit bill_of_materialx.boms_path
       #save_and_open_page
-      page.should have_content('BOMs')
+      expect(page).to have_content('BOMs')
       save_and_open_page
       click_link 'Quotes'
       save_and_open_page
       
-      visit boms_path
+      visit bill_of_materialx.boms_path
       click_link task.id.to_s
       #save_and_open_page
-      page.should have_content('BOM Info')
+      expect(page).to have_content('BOM Info')
       click_link 'New Log'
       #save_and_open_page
-      page.should have_content('Log')
+      expect(page).to have_content('Log')
       
-      visit new_bom_path(:project_id => @proj.id)
+      visit bill_of_materialx.new_bom_path(:project_id => @proj.id)
       save_and_open_page
-      page.should have_content('New BOM')
+      expect(page).to have_content('New BOM')
       fill_in 'bom_name', :with => 'a test bom'
-      fill_in 'bom_spec', :with => 'a test spec'
+      fill_in 'bom_spec', :with => 'a test spec-good'
       fill_in 'bom_qty', :with => 100
       select('piece', :from => 'bom_unit')
       click_button 'Save'
+      #
+      visit bill_of_materialx.boms_path
+      expect(page).to have_content('a test spec-good')
       #with wrong data
-      visit new_bom_path(:project_id => @proj.id)
-      page.should have_content('New BOM')
+      visit bill_of_materialx.new_bom_path(:project_id => @proj.id)
+      expect(page).to have_content('New BOM')
       fill_in 'bom_name', :with => ''
-      fill_in 'bom_spec', :with => 'a test spec'
+      fill_in 'bom_spec', :with => 'a test spec-bad'
       fill_in 'bom_qty', :with => 100
       select('piece', :from => 'bom_unit')
       click_button 'Save'
       save_and_open_page
-      
+      #
+      visit bill_of_materialx.boms_path
+      expect(page).not_to have_content('a test spec-bad')
       
     end
   end

@@ -1,8 +1,8 @@
 require "bill_of_materialx/engine"
 
 module BillOfMaterialx
-  mattr_accessor :project_class, :supplier_class, :manufacturer_class, :customer_class, :show_supplier_path, :quote_index_path, :quote_task_index_path,
-                 :task_class
+  mattr_accessor :project_class, :supplier_class, :manufacturer_class, :customer_class, :task_class
+                 
   
   def self.project_class
     @@project_class.constantize

@@ -2,13 +2,13 @@ require_dependency "bill_of_materialx/application_controller"
 
 module BillOfMaterialx
   class BomsController < ApplicationController
-    before_filter :require_employee
-    before_filter :load_parent_record
+    before_action :require_employee
+    before_action :load_parent_record
         
     def index
       @title = t('BOMs')
       @boms = params[:bill_of_materialx_boms][:model_ar_r]  #returned by check_access_right
-      @boms = @boms.where(:project_id => BillOfMaterialx.project_class.where(:customer_id => @customer.id).select('id')) if @customer
+      @boms = @boms.where(:project_id => BillOfMaterialx.project_class.where(:customer_id => @customer.id).pluck('id')) if @customer
       @boms = @boms.where(:project_id => @project.id) if @project       
       @boms = @boms.page(params[:page]).per_page(@max_pagination) 
       @erb_code = find_config_const('bom_index_view', 'bill_of_materialx')

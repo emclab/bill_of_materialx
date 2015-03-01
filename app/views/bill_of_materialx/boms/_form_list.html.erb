@@ -53,8 +53,8 @@
 		  	<td><%= r.receiving_date.strftime("%Y/%m/%d") if r.receiving_date.present? %></td>
 			<td><%= r.received ? t('Yes') : t('No') %></td>
 			<td><%= prt(r, 'last_updated_by.name') %></td> 
-			<td><%= link_to t('Quote Tasks'), SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.quote_task_index_path.to_s))}", :class => BUTTONS_CLS['action']   %></td>
-			<td><%= link_to t('Quotes'), SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(eval(BillOfMaterialx.quote_index_path.to_s))}", :class => BUTTONS_CLS['action']   %> </td>
+			<td><%= link_to t('Quote Tasks'), SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(event_taskx.event_tasks_path(task_category: 't_category'))}", :class => BUTTONS_CLS['action']   %></td>
+			<td><%= link_to t('Quotes'), SUBURI + "/authentify/view_handler?index=1&url=#{SUBURI + CGI::escape(in_quotex.quotes_path)}", :class => BUTTONS_CLS['action']   %> </td>
 			<td><%= link_to t('Edit'), SUBURI + "/authentify/view_handler?index=1&url=#{edit_bom_path(r, :parent_record_id => r.project_id, :parent_resource => BillOfMaterialx.project_class.to_s.underscore.pluralize)}", :class => BUTTONS_CLS['action']  if has_action_right?('update', params[:controller], r) %></td>
 		  </tr>
 		<% end %>

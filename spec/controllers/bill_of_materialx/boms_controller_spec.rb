@@ -1,10 +1,11 @@
-require 'spec_helper'
+require 'rails_helper'
 
 module BillOfMaterialx
-  describe BomsController do
+  RSpec.describe BomsController, type: :controller do
+    routes {BillOfMaterialx::Engine.routes}
     before(:each) do
-      controller.should_receive(:require_signin)
-      controller.should_receive(:require_employee)
+      expect(controller).to receive(:require_signin)
+      expect(controller).to receive(:require_employee)
            
     end
     before(:each) do
@@ -34,8 +35,8 @@ module BillOfMaterialx
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id)
         task1 = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id, :name => 'a new task')
-        get 'index', {:use_route => :bill_of_materialx}
-        assigns[:boms].should =~ [task, task1]
+        get 'index'
+        expect(assigns[:boms]).to match_array([task, task1])
       end
       
       it "should only return the part for a project_id" do
@@ -45,8 +46,8 @@ module BillOfMaterialx
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id)
         task1 = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id + 1, :name => 'a new task')
-        get 'index', {:use_route => :bill_of_materialx, :project_id => @proj.id}
-        assigns[:boms].should =~ [task]
+        get 'index', {:project_id => @proj.id}
+        expect(assigns[:boms]).to match_array([task])
       end
       
       it "should only return the part for the customer_id" do
@@ -56,8 +57,8 @@ module BillOfMaterialx
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id, :void => true)
         task1 = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id, :name => 'a new task')
-        get 'index', {:use_route => :bill_of_materialx, :project_id => @proj.id, :customer_id => @cust.id}
-        assigns[:boms].should =~ [task1]
+        get 'index', {:project_id => @proj.id, :customer_id => @cust.id}
+        expect(assigns[:boms]).to match_array([task1])
       end
             
     end
@@ -68,8 +69,8 @@ module BillOfMaterialx
         :sql_code => "")
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
-        get 'new', {:use_route => :bill_of_materialx,  :project_id => @proj.id}
-        response.should be_success
+        get 'new', { :project_id => @proj.id}
+        expect(response).to be_success
       end
       
     end
@@ -81,8 +82,8 @@ module BillOfMaterialx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.attributes_for(:bill_of_materialx_bom, :project_id => @proj.id )  
-        get 'create', {:use_route => :bill_of_materialx, :bom => task, :project_id => @proj.id}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
+        get 'create', {:bom => task, :project_id => @proj.id}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Saved!")
       end
       
       it "should render 'new' if data error" do        
@@ -91,8 +92,8 @@ module BillOfMaterialx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.attributes_for(:bill_of_materialx_bom, :project_id => @proj.id, :name => nil)
-        get 'create', {:use_route => :bill_of_materialx, :bom => task, :project_id => @proj.id}
-        response.should render_template('new')
+        get 'create', {:bom => task, :project_id => @proj.id}
+        expect(response).to render_template('new')
       end
     end
   
@@ -103,8 +104,8 @@ module BillOfMaterialx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id)
-        get 'edit', {:use_route => :bill_of_materialx, :id => task.id}
-        response.should be_success
+        get 'edit', {:id => task.id}
+        expect(response).to be_success
       end
       
     end
@@ -116,8 +117,8 @@ module BillOfMaterialx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id)
-        get 'update', {:use_route => :bill_of_materialx, :id => task.id, :bom => {:name => 'new name'}}
-        response.should redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
+        get 'update', {:id => task.id, :bom => {:name => 'new name'}}
+        expect(response).to redirect_to URI.escape(SUBURI + "/authentify/view_handler?index=0&msg=Successfully Updated!")
       end
       
       it "should render edit with data error" do
@@ -126,8 +127,8 @@ module BillOfMaterialx
         session[:user_id] = @u.id
         session[:user_privilege] = Authentify::UserPrivilegeHelper::UserPrivilege.new(@u.id)
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id)
-        get 'update', {:use_route => :bill_of_materialx, :id => task.id, :bom => {:name => ''}}
-        response.should render_template('edit')
+        get 'update', {:id => task.id, :bom => {:name => ''}}
+        expect(response).to render_template('edit')
       end
     end
   
@@ -141,8 +142,8 @@ module BillOfMaterialx
         status = FactoryGirl.create(:commonx_misc_definition, :for_which => 'part_purchasing_status')
         task = FactoryGirl.create(:bill_of_materialx_bom, :project_id => @proj.id, :supplier_id => supplier.id, :status_id => status.id, 
                                   :manufacturer_id => @mfg.id, :last_updated_by_id => @u.id)
-        get 'show', {:use_route => :bill_of_materialx, :id => task.id}
-        response.should be_success
+        get 'show', {:id => task.id}
+        expect(response).to be_success
       end
     end
     
